@@ -310,50 +310,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Seed database endpoint (temporary for deployment)
+  // Seed database endpoint (clears DB and loads all 15 users with photos)
   app.post("/api/admin/seed", async (req, res) => {
     try {
-      const sampleUsers = [
-        { name: "Carlos", age: 32, bio: "Gordo y orgulloso. Me encanta comer y no me avergüenzo de mi barriga." },
-        { name: "María", age: 28, bio: "Acné adulto y carácter fuerte. No finjo ser perfecta." },
-        { name: "Jorge", age: 45, bio: "Canoso prematuro y adicto al trabajo. La vida me marcó." },
-        { name: "Laura", age: 35, bio: "Celulitis visible e insegura. Aprendiendo a aceptarme." },
-        { name: "Roberto", age: 29, bio: "Dientes chuecos y tímido. Sonrío poco pero soy buena onda." },
-      ];
-
-      const defectTemplates = [
-        { category: "Físico", title: "Sobrepeso", description: "Tengo unos kilos de más y me acepto" },
-        { category: "Personalidad", title: "Impuntual", description: "Siempre llego tarde a todo" },
-        { category: "Físico", title: "Acné", description: "Marcas de acné que cuentan mi historia" },
-      ];
-
-      const createdUsers = [];
-      for (const userData of sampleUsers) {
-        const user = await storage.createUser(userData);
-        
-        // Create defects
-        for (const defect of defectTemplates.slice(0, 2)) {
-          await storage.createDefect({
-            userId: user.id,
-            ...defect
-          });
-        }
-
-        // Create a placeholder photo
-        const placeholderImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2RkZCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UGVyZmlsPC90ZXh0Pjwvc3ZnPg==";
-        await storage.createPhoto({
-          userId: user.id,
-          url: placeholderImage,
-          isPrimary: true,
-        });
-
-        createdUsers.push(user);
-      }
-
+      // Import database tables
+      const { users: usersTable, defects: defectsTable, photos: photosTable, likes: likesTable, matches: matchesTable } = await import("@shared/schema");
+      const { db } = await import("./storage");
+      
+      // Clear database
+      await db.delete(matchesTable);
+      await db.delete(likesTable);
+      await db.delete(photosTable);
+      await db.delete(defectsTable);
+      await db.delete(usersTable);
+      
+      console.log("✓ Database cleared");
+      
+      // Import and execute seed module
+      const { execSync } = await import("child_process");
+      execSync("npx tsx server/seed-simple.ts", { 
+        cwd: process.cwd(),
+        stdio: "inherit" 
+      });
+      
       res.json({ 
         success: true, 
-        message: `${createdUsers.length} usuarios creados exitosamente`,
-        users: createdUsers 
+        message: "Base de datos limpiada y 15 usuarios creados con fotos completas"
       });
     } catch (error) {
       console.error("Error seeding database:", error);
