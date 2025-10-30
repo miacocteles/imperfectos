@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Heart, X, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, X, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ProfileWithDetails } from "@shared/schema";
 
 interface ProfileDetailViewProps {
@@ -206,6 +206,17 @@ export function ProfileDetailView({
                     <p className="text-base text-foreground leading-relaxed" data-testid={`text-defect-description-${index}`}>
                       {defect.description}
                     </p>
+
+                    {/* Show defect photo if exists and it's a physical defect */}
+                    {defect.photoUrl && defect.category === 'fisico' && (
+                      <div className="mt-4">
+                        <img
+                          src={defect.photoUrl}
+                          alt={`Foto de ${defect.title}`}
+                          className="w-full max-w-xs rounded-lg shadow-md"
+                        />
+                      </div>
+                    )}
                   </div>
                 </Card>
               ))}
@@ -235,11 +246,10 @@ export function ProfileDetailView({
               <Button
                 variant="default"
                 size="lg"
-                className="flex-1 h-14 rounded-full text-base font-medium"
+                className="flex-1 h-14 rounded-full text-base font-semibold"
                 onClick={onLike}
                 data-testid="button-like-detail"
               >
-                <Heart className="w-5 h-5 mr-2" />
                 Me interesa
               </Button>
             </div>

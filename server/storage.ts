@@ -79,6 +79,15 @@ class DatabaseStorage implements IStorage {
     return db.select().from(schema.defects).where(eq(schema.defects.userId, userId));
   }
 
+  async updateDefectPhoto(defectId: string, photoUrl: string): Promise<Defect | undefined> {
+    const [defect] = await db
+      .update(schema.defects)
+      .set({ photoUrl })
+      .where(eq(schema.defects.id, defectId))
+      .returning();
+    return defect;
+  }
+
   async createPhoto(insertPhoto: InsertPhoto): Promise<Photo> {
     const [photo] = await db.insert(schema.photos).values(insertPhoto).returning();
     return photo;

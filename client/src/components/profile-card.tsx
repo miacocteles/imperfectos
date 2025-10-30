@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, X, TrendingUp, Info } from "lucide-react";
+import { X, TrendingUp, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import type { ProfileCard as ProfileCardType } from "@shared/schema";
 
@@ -43,11 +43,11 @@ export function ProfileCard({
   return (
     <div className="flex flex-col gap-5">
       <motion.div
-        whileHover={{ y: -2 }}
-        transition={{ duration: 0.2 }}
+        whileHover={{ y: -4, scale: 1.02 }}
+        transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
       >
         <Card 
-          className="overflow-hidden cursor-pointer border border-border/50 shadow-card hover:shadow-romantic transition-all duration-300 rounded-2xl bg-white"
+          className="overflow-hidden cursor-pointer border-2 border-primary/20 shadow-lg hover:shadow-2xl hover:border-primary/40 transition-all duration-300 rounded-3xl bg-white card-3d"
           onClick={handleCardClick}
           data-testid={`card-profile-${profile.id}`}
         >
@@ -61,7 +61,7 @@ export function ProfileCard({
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
                 <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-3">
-                  <Heart className="w-8 h-8 text-muted-foreground/50" />
+                  <span className="text-4xl">📷</span>
                 </div>
                 <p className="text-sm font-medium">Aún sin fotos</p>
               </div>
@@ -108,7 +108,6 @@ export function ProfileCard({
                     {profile.name}, {profile.age}
                   </h3>
                   <p className="text-sm font-medium opacity-95 flex items-center gap-1.5" data-testid={`text-defect-count-${profile.id}`}>
-                    <Heart className="w-3.5 h-3.5" />
                     {profile.defectCount} {profile.defectCount === 1 ? 'defecto compartido' : 'defectos compartidos'}
                   </p>
                 </div>
@@ -154,27 +153,28 @@ export function ProfileCard({
             whileTap={{ scale: 0.95 }}
           >
             <Button
-              size="icon"
+              size="lg"
               variant="outline"
-              className="w-16 h-16 rounded-full shadow-card border-2 border-border hover:border-destructive/30 hover:bg-destructive/5 transition-all"
+              className="h-14 px-6 rounded-full shadow-lg border-2 border-destructive/40 hover:border-destructive hover:bg-destructive/10 transition-all text-base"
               onClick={handlePass}
               data-testid={`button-pass-${profile.id}`}
             >
-              <X className="w-7 h-7 text-destructive" />
+              <X className="w-5 h-5 mr-2 text-destructive" />
+              Pasar
             </Button>
           </motion.div>
 
           <motion.div
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
           >
             <Button
-              size="icon"
-              className="w-20 h-20 rounded-full shadow-romantic bg-gradient-to-br from-primary to-secondary border-0 hover:shadow-card transition-all"
+              size="lg"
+              className="h-14 px-8 rounded-full shadow-xl bg-gradient-to-br from-primary via-secondary to-accent border-0 hover:shadow-2xl transition-all text-base font-semibold"
               onClick={handleLike}
               data-testid={`button-like-${profile.id}`}
             >
-              <Heart className="w-8 h-8" />
+              Me interesa
             </Button>
           </motion.div>
         </motion.div>

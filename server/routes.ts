@@ -78,10 +78,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create profile with photos and defects
-  app.post("/api/profiles", upload.array("photos", 6), async (req, res) => {
+  app.post("/api/profiles", upload.fields([
+    { name: 'photos', maxCount: 6 },
+    { name: 'defectPhotos', maxCount: 10 }
+  ]), async (req, res) => {
     try {
       const { name, age, bio, defects } = req.body;
-      const files = req.files as Express.Multer.File[];
+      const files = req.files as { photos?: Express.Multer.File[], defectPhotos?: Express.Multer.File[] };
+      const profilePhotos = files.photos || [];
+      const defectPhotoFiles = files.defectPhotos || [];
 
       // Validation
       if (!name || !age) {
@@ -93,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Age must be between 18 and 100" });
       }
 
-      if (!files || files.length === 0) {
+      if (!profilePhotos || profilePhotos.length === 0) {
         return res.status(400).json({ message: "At least one photo is required" });
       }
 
@@ -127,17 +132,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       currentUserId = user.id;
 
       // Create defects
-      for (const defect of parsedDefects) {
-        await storage.createDefect({
+      const createdDefects = [];
+      for (let i = 0; i < parsedDefects.length; i++) {
+        const defect = parsedDefects[i];
+        const createdDefect = await storage.createDefect({
           userId: user.id,
           category: defect.category,
           title: defect.title,
           description: defect.description,
         });
+        createdDefects.push({ index: i, id: createdDefect.id });
       }
 
-      // Upload and validate photos
-      const photoPromises = files.map(async (file, index) => {
+      // Upload profile photos
+      const photoPromises = profilePhotos.map(async (file, index) => {
         try {
           // Convert buffer to base64
           const base64Image = file.buffer.toString("base64");
@@ -172,6 +180,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const validationResults = await Promise.all(photoPromises);
+
+      // Upload defect photos if any
+      if (defectPhotoFiles && defectPhotoFiles.length > 0) {
+        for (const file of defectPhotoFiles) {
+          try {
+            // Extract defect index from field name (e.g., "defectPhotos[0]" -> 0)
+            const fieldNameMatch = file.fieldname.match(/\[(\d+)\]/);
+            if (!fieldNameMatch) continue;
+            
+            const defectIndex = parseInt(fieldNameMatch[1]);
+            const defectRecord = createdDefects.find(d => d.index === defectIndex);
+            
+            if (defectRecord) {
+              // Convert buffer to base64
+              const base64Image = file.buffer.toString("base64");
+              const photoUrl = `data:${file.mimetype};base64,${base64Image}`;
+              
+              // Update defect with photo
+              await storage.updateDefectPhoto(defectRecord.id, photoUrl);
+            }
+          } catch (error) {
+            console.error("Error processing defect photo:", error);
+          }
+        }
+      }
 
       res.json({
         user,

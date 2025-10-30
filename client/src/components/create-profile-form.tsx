@@ -32,6 +32,8 @@ interface DefectInput {
   category: string;
   title: string;
   description: string;
+  photoFile?: File;
+  photoPreview?: string;
 }
 
 interface PhotoUpload {
@@ -48,6 +50,7 @@ interface CreateProfileFormProps {
     profile: ProfileFormData;
     defects: DefectInput[];
     photos: File[];
+    defectPhotos: { defectIndex: number; file: File }[]; // NEW: Fotos de defectos
   }) => Promise<void>;
   isSubmitting?: boolean;
 }
@@ -132,6 +135,37 @@ export function CreateProfileForm({ onSubmit, isSubmitting = false }: CreateProf
     ));
   };
 
+  const handleDefectPhotoUpload = (defectId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('La foto excede el límite de 10MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se permiten archivos de imagen');
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    setDefects(prev => prev.map(d => 
+      d.id === defectId ? { ...d, photoFile: file, photoPreview: preview } : d
+    ));
+  };
+
+  const removeDefectPhoto = (defectId: string) => {
+    setDefects(prev => prev.map(d => {
+      if (d.id === defectId && d.photoPreview) {
+        URL.revokeObjectURL(d.photoPreview);
+        return { ...d, photoFile: undefined, photoPreview: undefined };
+      }
+      return d;
+    }));
+  };
+
   const handleFormSubmit = async (data: ProfileFormData) => {
     const validDefects = defects.filter(d => d.title && d.description);
     
@@ -145,10 +179,21 @@ export function CreateProfileForm({ onSubmit, isSubmitting = false }: CreateProf
       return;
     }
 
+    // Recopilar fotos de defectos físicos
+    const defectPhotos = validDefects
+      .map((defect, index) => {
+        if (defect.photoFile) {
+          return { defectIndex: index, file: defect.photoFile };
+        }
+        return null;
+      })
+      .filter((item): item is { defectIndex: number; file: File } => item !== null);
+
     await onSubmit({
       profile: data,
       defects: validDefects,
       photos: photos.map(p => p.file),
+      defectPhotos,
     });
   };
 
@@ -356,6 +401,48 @@ export function CreateProfileForm({ onSubmit, isSubmitting = false }: CreateProf
                     {defect.description.length} caracteres (mínimo recomendado: 100)
                   </p>
                 </div>
+
+                {/* Photo upload for physical defects */}
+                {defect.category === "fisico" && (
+                  <div>
+                    <Label>Foto del defecto físico (opcional)</Label>
+                    <div className="mt-2">
+                      {!defect.photoPreview ? (
+                        <label className="block cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleDefectPhotoUpload(defect.id, e)}
+                            className="hidden"
+                          />
+                          <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              Sube una foto que muestre este defecto
+                            </p>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="relative inline-block rounded-lg overflow-hidden group">
+                          <img
+                            src={defect.photoPreview}
+                            alt="Defecto físico"
+                            className="w-32 h-32 object-cover"
+                          />
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="destructive"
+                            className="absolute top-1 right-1 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeDefectPhoto(defect.id)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
           ))}

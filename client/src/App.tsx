@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, Route, useLocation, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -5,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Heart, Compass, UserPlus, Home as HomeIcon } from "lucide-react";
+import { Compass, UserPlus, Home as HomeIcon } from "lucide-react";
 import { UserSelector } from "@/components/user-selector";
 import { motion } from "framer-motion";
 import Home from "@/pages/home";
@@ -19,7 +20,7 @@ function Navigation() {
 
   const navItems = [
     { path: "/", label: "Descubrir", icon: Compass },
-    { path: "/matches", label: "Matches", icon: Heart },
+    { path: "/matches", label: "Matches", icon: Compass }, // Reutilizamos Compass o null
     { path: "/create-profile", label: "Perfil", icon: UserPlus },
   ];
 
@@ -79,7 +80,7 @@ function DesktopHeader() {
             data-testid="link-logo"
           >
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-sm">
-              <Heart className="w-4 h-4 text-white" />
+              <span className="text-white font-bold text-sm">I</span>
             </div>
             <span className="text-lg font-bold tracking-tight">Imperfectos</span>
           </motion.div>
@@ -130,13 +131,18 @@ function AppContent() {
     queryKey: ["/api/auth/current-user"],
   });
 
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const isCreatingProfile = location === "/create-profile";
 
-  // Show user selector if no current user and not creating profile
-  if (!isLoading && !currentUser?.user && !isCreatingProfile) {
-    return <UserSelector />;
-  }
+  // If there's no current user, redirect to the create profile page so
+  // the visitor is prompted to register first instead of picking an
+  // existing seeded user. We use useEffect to avoid triggering a
+  // navigation during render.
+  React.useEffect(() => {
+    if (!isLoading && !currentUser?.user && !isCreatingProfile) {
+      setLocation('/create-profile');
+    }
+  }, [isLoading, currentUser, isCreatingProfile, setLocation]);
 
   return (
     <div className="min-h-screen bg-background">

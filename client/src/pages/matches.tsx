@@ -5,7 +5,7 @@ import { MatchListItem } from "@/components/match-list-item";
 import { ProfileDetailView } from "@/components/profile-detail-view";
 import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart, Sparkles, Users, PartyPopper } from "lucide-react";
+import { Sparkles, Users, PartyPopper } from "lucide-react";
 import type { MatchWithProfile, ProfileWithDetails } from "@shared/schema";
 
 export default function Matches() {
@@ -100,7 +100,7 @@ export default function Matches() {
                 <div className="relative w-32 h-32 mx-auto">
                   <div className="absolute inset-0 gradient-romantic rounded-full opacity-20 blur-2xl" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Heart className="w-20 h-20 text-primary" />
+                    <span className="text-7xl">✓</span>
                   </div>
                 </div>
               </motion.div>

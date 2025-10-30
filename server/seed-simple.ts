@@ -28,7 +28,15 @@ const placeholderImages = {
     "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=800",
     "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800",
     "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800"
-  ]
+  ],
+  // Imágenes específicas para defectos físicos
+  physical_defects: {
+    acne: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=600",
+    baldness: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=600",
+    overweight: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=600",
+    scars: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=600",
+    wrinkles: "https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?w=600"
+  }
 };
 
 // Definición de usuarios con sus defectos
@@ -38,8 +46,8 @@ const seedUsers = [
     age: 32,
     bio: "Gordo y orgulloso. Me encanta comer y no me avergüenzo de mi barriga.",
     defects: [
-      { category: "fisico", title: "Sobrepeso", description: "Tengo 40 kilos de más y una barriga prominente" },
-      { category: "fisico", title: "Calvicie avanzada", description: "Perdí todo el pelo a los 28 años" },
+      { category: "fisico", title: "Sobrepeso", description: "Tengo 40 kilos de más y una barriga prominente", photoUrl: placeholderImages.physical_defects.overweight },
+      { category: "fisico", title: "Calvicie avanzada", description: "Perdí todo el pelo a los 28 años", photoUrl: placeholderImages.physical_defects.baldness },
       { category: "personalidad", title: "Procrastinador crónico", description: "Dejo todo para último momento" },
     ],
     images: placeholderImages.overweight_man
@@ -49,7 +57,7 @@ const seedUsers = [
     age: 28,
     bio: "Acné adulto y carácter fuerte. No finjo ser perfecta.",
     defects: [
-      { category: "fisico", title: "Acné severo", description: "Tengo acné en cara y espalda desde la adolescencia" },
+      { category: "fisico", title: "Acné severo", description: "Tengo acné en cara y espalda desde la adolescencia", photoUrl: placeholderImages.physical_defects.acne },
       { category: "fisico", title: "Ojeras pronunciadas", description: "Siempre parezco cansada por mis ojeras" },
       { category: "personalidad", title: "Mal genio", description: "Me enojo fácilmente y grito cuando me frustro" },
     ],
@@ -58,10 +66,10 @@ const seedUsers = [
   {
     name: "Jorge",
     age: 45,
-    bio: "Canoso prematuro y adicto al trabajo. La vida me marcó.",
+    bio: "Canas prematuras y arrugas. Soy workaholic pero estoy cambiando.",
     defects: [
-      { category: "fisico", title: "Canas prematuras", description: "Todo el pelo gris desde los 30" },
-      { category: "fisico", title: "Arrugas profundas", description: "Arrugas marcadas en frente y ojos" },
+      { category: "fisico", title: "Canas prematuras", description: "Todo el pelo gris desde los 30", photoUrl: placeholderImages.physical_defects.baldness },
+      { category: "fisico", title: "Arrugas profundas", description: "Arrugas marcadas en frente y ojos", photoUrl: placeholderImages.physical_defects.wrinkles },
       { category: "personalidad", title: "Workaholic", description: "No puedo desconectar del trabajo, reviso emails 24/7" },
     ],
     images: placeholderImages.older_man
@@ -71,8 +79,8 @@ const seedUsers = [
     age: 35,
     bio: "Celulitis visible e insegura. Aprendiendo a aceptarme.",
     defects: [
-      { category: "fisico", title: "Celulitis severa", description: "Celulitis visible en piernas y glúteos" },
-      { category: "fisico", title: "Estrías", description: "Estrías en abdomen y muslos" },
+      { category: "fisico", title: "Celulitis severa", description: "Celulitis visible en piernas y glúteos", photoUrl: placeholderImages.physical_defects.overweight },
+      { category: "fisico", title: "Estrías", description: "Estrías en abdomen y muslos", photoUrl: placeholderImages.physical_defects.scars },
       { category: "personalidad", title: "Baja autoestima", description: "Me comparo constantemente con otros" },
     ],
     images: [placeholderImages.diverse_people[0], placeholderImages.diverse_people[1], placeholderImages.diverse_people[2]]
@@ -82,8 +90,8 @@ const seedUsers = [
     age: 29,
     bio: "Dientes chuecos y tímido. Sonrío poco pero soy buena onda.",
     defects: [
-      { category: "fisico", title: "Dientes torcidos", description: "Nunca usé brackets, dientes muy chuecos" },
-      { category: "fisico", title: "Orejas grandes", description: "Orejas prominentes que sobresalen" },
+      { category: "fisico", title: "Dientes torcidos", description: "Nunca usé brackets, dientes muy chuecos", photoUrl: placeholderImages.physical_defects.acne },
+      { category: "fisico", title: "Orejas grandes", description: "Orejas prominentes que sobresalen", photoUrl: placeholderImages.physical_defects.scars },
       { category: "personalidad", title: "Timidez extrema", description: "Me cuesta hablar con personas nuevas" },
     ],
     images: [placeholderImages.diverse_people[3], placeholderImages.diverse_people[4], placeholderImages.overweight_man[1]]
@@ -93,8 +101,8 @@ const seedUsers = [
     age: 41,
     bio: "Manchas en la piel y controladora. Soy quien soy.",
     defects: [
-      { category: "fisico", title: "Vitiligo", description: "Manchas blancas en cara y manos por vitiligo" },
-      { category: "fisico", title: "Vello facial", description: "Crecimiento de vello en mentón y labio superior" },
+      { category: "fisico", title: "Vitiligo", description: "Manchas blancas en cara y manos por vitiligo", photoUrl: placeholderImages.physical_defects.scars },
+      { category: "fisico", title: "Vello facial", description: "Crecimiento de vello en mentón y labio superior", photoUrl: placeholderImages.physical_defects.baldness },
       { category: "personalidad", title: "Control freak", description: "Necesito controlar todo, me estresa el desorden" },
     ],
     images: [placeholderImages.woman_natural[1], placeholderImages.woman_natural[2], placeholderImages.diverse_people[5]]
@@ -104,8 +112,8 @@ const seedUsers = [
     age: 38,
     bio: "Pancita cervecera y ruidoso. Me río fuerte de todo.",
     defects: [
-      { category: "fisico", title: "Barriga cervecera", description: "Abdomen prominente por amor a la cerveza" },
-      { category: "fisico", title: "Nariz grande", description: "Nariz grande y ancha, muy notoria" },
+      { category: "fisico", title: "Barriga cervecera", description: "Abdomen prominente por amor a la cerveza", photoUrl: placeholderImages.physical_defects.overweight },
+      { category: "fisico", title: "Nariz grande", description: "Nariz grande y ancha, muy notoria", photoUrl: placeholderImages.physical_defects.acne },
       { category: "personalidad", title: "Habla muy fuerte", description: "No controlo el volumen de mi voz" },
     ],
     images: [placeholderImages.overweight_man[2], placeholderImages.older_man[1], placeholderImages.diverse_people[6]]
@@ -115,8 +123,8 @@ const seedUsers = [
     age: 26,
     bio: "Pecas extremas y desordenada. Mi cuarto es un caos.",
     defects: [
-      { category: "fisico", title: "Pecas en exceso", description: "Cara cubierta de pecas y manchas solares" },
-      { category: "fisico", title: "Cabello rebelde", description: "Pelo súper crespo e indomable" },
+      { category: "fisico", title: "Pecas en exceso", description: "Cara cubierta de pecas y manchas solares", photoUrl: placeholderImages.physical_defects.acne },
+      { category: "fisico", title: "Cabello rebelde", description: "Pelo súper crespo e indomable", photoUrl: placeholderImages.physical_defects.baldness },
       { category: "personalidad", title: "Desorganizada total", description: "Pierdo todo, mi vida es un desastre" },
     ],
     images: [placeholderImages.diverse_people[7], placeholderImages.woman_natural[0], placeholderImages.diverse_people[1]]
@@ -126,8 +134,8 @@ const seedUsers = [
     age: 52,
     bio: "Panza grande y mentiroso compulsivo. Trabajo en ello.",
     defects: [
-      { category: "fisico", title: "Obesidad", description: "100+ kilos, panza muy grande" },
-      { category: "fisico", title: "Papada pronunciada", description: "Doble mentón muy visible" },
+      { category: "fisico", title: "Obesidad", description: "100+ kilos, panza muy grande", photoUrl: placeholderImages.physical_defects.overweight },
+      { category: "fisico", title: "Papada pronunciada", description: "Doble mentón muy visible", photoUrl: placeholderImages.physical_defects.overweight },
       { category: "personalidad", title: "Mentiroso compulsivo", description: "Miento sin necesidad, es automático" },
     ],
     images: [placeholderImages.older_man[2], placeholderImages.overweight_man[0], placeholderImages.older_man[0]]
@@ -137,8 +145,8 @@ const seedUsers = [
     age: 31,
     bio: "Cicatrices de acné y celosa. Mi piel cuenta historias.",
     defects: [
-      { category: "fisico", title: "Cicatrices de acné", description: "Marcas profundas en mejillas y frente" },
-      { category: "fisico", title: "Piel grasa", description: "Cara siempre brillante por grasa excesiva" },
+      { category: "fisico", title: "Cicatrices de acné", description: "Marcas profundas en mejillas y frente", photoUrl: placeholderImages.physical_defects.acne },
+      { category: "fisico", title: "Piel grasa", description: "Cara siempre brillante por grasa excesiva", photoUrl: placeholderImages.physical_defects.acne },
       { category: "personalidad", title: "Celos enfermizos", description: "Reviso el celular de mi pareja constantemente" },
     ],
     images: [placeholderImages.diverse_people[4], placeholderImages.woman_natural[1], placeholderImages.diverse_people[2]]
@@ -148,8 +156,8 @@ const seedUsers = [
     age: 43,
     bio: "Calvo total y egoísta. Al menos soy honesto.",
     defects: [
-      { category: "fisico", title: "Calvicie total", description: "Ni un pelo en la cabeza, calvo completo" },
-      { category: "fisico", title: "Manchas de edad", description: "Manchas cafés en cara y brazos" },
+      { category: "fisico", title: "Calvicie total", description: "Ni un pelo en la cabeza, calvo completo", photoUrl: placeholderImages.physical_defects.baldness },
+      { category: "fisico", title: "Manchas de edad", description: "Manchas cafés en cara y brazos", photoUrl: placeholderImages.physical_defects.scars },
       { category: "personalidad", title: "Egocéntrico", description: "Todo gira en torno a mí, primero yo" },
     ],
     images: [placeholderImages.older_man[1], placeholderImages.diverse_people[3], placeholderImages.older_man[2]]
@@ -159,8 +167,8 @@ const seedUsers = [
     age: 37,
     bio: "Várices visibles y criticona. Digo lo que pienso.",
     defects: [
-      { category: "fisico", title: "Várices", description: "Venas varicosas muy visibles en piernas" },
-      { category: "fisico", title: "Bolsas en ojos", description: "Bolsas permanentes bajo los ojos" },
+      { category: "fisico", title: "Várices", description: "Venas varicosas muy visibles en piernas", photoUrl: placeholderImages.physical_defects.scars },
+      { category: "fisico", title: "Bolsas en ojos", description: "Bolsas permanentes bajo los ojos", photoUrl: placeholderImages.physical_defects.wrinkles },
       { category: "personalidad", title: "Criticona", description: "Critico todo y a todos, no me callo nada" },
     ],
     images: [placeholderImages.woman_natural[2], placeholderImages.diverse_people[5], placeholderImages.woman_natural[0]]
@@ -170,8 +178,8 @@ const seedUsers = [
     age: 34,
     bio: "Joroba y pesimista. La vida es dura.",
     defects: [
-      { category: "fisico", title: "Postura encorvada", description: "Espalda encorvada, joroba visible" },
-      { category: "fisico", title: "Acné en espalda", description: "Espinillas y granos en toda la espalda" },
+      { category: "fisico", title: "Postura encorvada", description: "Espalda encorvada, joroba visible", photoUrl: placeholderImages.physical_defects.overweight },
+      { category: "fisico", title: "Acné en espalda", description: "Espinillas y granos en toda la espalda", photoUrl: placeholderImages.physical_defects.acne },
       { category: "personalidad", title: "Pesimista crónico", description: "Todo lo veo mal, siempre espero lo peor" },
     ],
     images: [placeholderImages.diverse_people[6], placeholderImages.overweight_man[1], placeholderImages.diverse_people[7]]
@@ -181,8 +189,8 @@ const seedUsers = [
     age: 29,
     bio: "Dientes amarillos y chismosa. Café es mi vida.",
     defects: [
-      { category: "fisico", title: "Dientes manchados", description: "Dientes amarillos por café y cigarro" },
-      { category: "fisico", title: "Lunares grandes", description: "Lunares grandes y oscuros en cara" },
+      { category: "fisico", title: "Dientes manchados", description: "Dientes amarillos por café y cigarro", photoUrl: placeholderImages.physical_defects.acne },
+      { category: "fisico", title: "Lunares grandes", description: "Lunares grandes y oscuros en cara", photoUrl: placeholderImages.physical_defects.scars },
       { category: "personalidad", title: "Chismosa", description: "Me encanta el chisme, cuento todo lo que sé" },
     ],
     images: [placeholderImages.diverse_people[0], placeholderImages.woman_natural[1], placeholderImages.diverse_people[4]]
@@ -192,8 +200,8 @@ const seedUsers = [
     age: 40,
     bio: "Barba con canas e impuntual. Siempre llego tarde.",
     defects: [
-      { category: "fisico", title: "Barba desprolija con canas", description: "Barba irregular, mitad gris mitad negro" },
-      { category: "fisico", title: "Entradas pronunciadas", description: "Frente amplia, perdiendo pelo en sienes" },
+      { category: "fisico", title: "Barba desprolija con canas", description: "Barba irregular, mitad gris mitad negro", photoUrl: placeholderImages.physical_defects.baldness },
+      { category: "fisico", title: "Entradas pronunciadas", description: "Frente amplia, perdiendo pelo en sienes", photoUrl: placeholderImages.physical_defects.baldness },
       { category: "personalidad", title: "Impuntualidad crónica", description: "Llego tarde a todo, es un problema serio" },
     ],
     images: [placeholderImages.older_man[0], placeholderImages.diverse_people[3], placeholderImages.older_man[1]]
@@ -224,6 +232,7 @@ async function seedDatabase() {
           category: defect.category,
           title: defect.title,
           description: defect.description,
+          photoUrl: (defect as any).photoUrl || null,
         });
       }
       console.log(`✓ ${userData.defects.length} defectos creados`);

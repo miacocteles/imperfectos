@@ -17,6 +17,7 @@ export const defects = pgTable("defects", {
   category: text("category").notNull(), // emocional, fisico, personalidad, habitos
   title: text("title").notNull(),
   description: text("description").notNull(),
+  photoUrl: text("photo_url"), // Optional: for physical defects
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

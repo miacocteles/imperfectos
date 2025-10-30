@@ -5,7 +5,7 @@ import { ProfileCard } from "@/components/profile-card";
 import { ProfileDetailView } from "@/components/profile-detail-view";
 import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart, Users, Compass } from "lucide-react";
+import { Users, Compass } from "lucide-react";
 import type { ProfileCard as ProfileCardType, ProfileWithDetails } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -144,7 +144,7 @@ export default function Home() {
         >
           <div className="mb-8">
             <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-card flex items-center justify-center">
-              <Heart className="w-12 h-12 text-white" />
+              <span className="text-5xl">✓</span>
             </div>
           </div>
           <h2 className="text-2xl font-bold mb-4">

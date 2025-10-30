@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronRight, Heart, TrendingUp } from "lucide-react";
+import { ChevronRight, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import type { MatchWithProfile } from "@shared/schema";
 
@@ -38,8 +38,8 @@ export function MatchListItem({ match, onClick }: MatchListItemProps) {
               </AvatarFallback>
             </Avatar>
             {/* Badge de match */}
-            <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-border/50">
-              <Heart className="w-3 h-3 text-primary" />
+            <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-sm">
+              ✓
             </div>
           </div>
 

@@ -13,6 +13,7 @@ export default function CreateProfile() {
       profile: { name: string; age: number; bio?: string };
       defects: Array<{ category: string; title: string; description: string }>;
       photos: File[];
+      defectPhotos: { defectIndex: number; file: File }[];
     }) => {
       // Validate file sizes
       for (const photo of data.photos) {
@@ -32,6 +33,11 @@ export default function CreateProfile() {
       
       data.photos.forEach((photo) => {
         formData.append(`photos`, photo);
+      });
+
+      // Add defect photos
+      data.defectPhotos.forEach((defectPhoto) => {
+        formData.append(`defectPhotos[${defectPhoto.defectIndex}]`, defectPhoto.file);
       });
 
       const response = await fetch("/api/profiles", {

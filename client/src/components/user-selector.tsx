@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { queryClient } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
-import { UserPlus, Heart, ChevronRight } from "lucide-react";
+import { UserPlus, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 
@@ -85,7 +85,7 @@ export function UserSelector() {
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xl" />
                 <div className="relative bg-gradient-to-br from-primary to-secondary p-4 rounded-xl shadow-card">
-                  <Heart className="w-10 h-10 text-white" />
+                  <span className="text-white font-bold text-4xl">I</span>
                 </div>
               </div>
             </div>
