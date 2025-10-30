@@ -11,7 +11,8 @@
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "seed": "tsx server/seed.ts",
-    "seed:simple": "tsx server/seed-simple.ts"
+    "seed:simple": "tsx server/seed-simple.ts",
+    "db:clear": "tsx server/clear-and-seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
