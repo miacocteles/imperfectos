@@ -22,7 +22,12 @@ export function ProfileCard({
   showActions = true 
 }: ProfileCardProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const photos = profile.allPhotos.length > 0 ? profile.allPhotos : (profile.primaryPhoto ? [profile.primaryPhoto] : []);
+  
+  // Combinar fotos de perfil con fotos de defectos
+  const profilePhotos = profile.allPhotos.length > 0 ? profile.allPhotos : (profile.primaryPhoto ? [profile.primaryPhoto] : []);
+  const defectPhotos = profile.defectPhotos || [];
+  const allPhotos = [...profilePhotos, ...defectPhotos];
+  const defectStartIndex = profilePhotos.length; // Índice donde empiezan las fotos de defectos
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Si se hace clic en los lados, cambiar foto
@@ -36,7 +41,7 @@ export function ProfileCard({
       return;
     }
     
-    if (x > third * 2 && currentPhotoIndex < photos.length - 1) {
+    if (x > third * 2 && currentPhotoIndex < allPhotos.length - 1) {
       e.stopPropagation();
       setCurrentPhotoIndex(prev => prev + 1);
       return;
@@ -76,14 +81,16 @@ export function ProfileCard({
             className="relative aspect-[3/4] bg-gradient-to-br from-muted/30 to-muted/10"
             onClick={handleCardClick}
           >
-            {photos.length > 0 ? (
+            {allPhotos.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={currentPhotoIndex}
-                    src={photos[currentPhotoIndex]}
+                    src={allPhotos[currentPhotoIndex]}
                     alt={`${profile.name}, ${profile.age}`}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover ${
+                      currentPhotoIndex >= defectStartIndex ? 'ring-4 ring-red-500 ring-inset' : ''
+                    }`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -92,15 +99,15 @@ export function ProfileCard({
                 </AnimatePresence>
                 
                 {/* Indicadores de foto */}
-                {photos.length > 1 && (
+                {allPhotos.length > 1 && (
                   <div className="absolute top-2 left-0 right-0 flex justify-center gap-1 px-2 z-10">
-                    {photos.map((_, index) => (
+                    {allPhotos.map((_, index) => (
                       <div
                         key={index}
                         className={`h-1 flex-1 rounded-full transition-all ${
                           index === currentPhotoIndex
-                            ? 'bg-white'
-                            : 'bg-white/40'
+                            ? index >= defectStartIndex ? 'bg-red-500' : 'bg-white'
+                            : index >= defectStartIndex ? 'bg-red-500/40' : 'bg-white/40'
                         }`}
                       />
                     ))}

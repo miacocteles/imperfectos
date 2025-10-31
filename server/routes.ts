@@ -157,23 +157,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdDefects.push({ index: i, id: createdDefect.id });
       }
 
-      // Upload profile photos
+      // Upload profile photos (optimized for speed)
       console.log(`📸 Processing ${profilePhotos.length} profile photos...`);
-      console.log(`⏱️  Esto puede tomar ${profilePhotos.length * 2}-${profilePhotos.length * 4} segundos dependiendo del tamaño de las imágenes...`);
+      console.log(`⏱️  Compresión rápida optimizada, tomará ~${profilePhotos.length} segundos...`);
       
       const photoPromises = profilePhotos.map(async (file, index) => {
         try {
           console.log(`  Photo ${index + 1}: ${file.mimetype}, original size: ${(file.size / 1024).toFixed(0)} KB`);
           
-          // Compress image using sharp
+          // Compress image using sharp - optimized for speed
           const compressedBuffer = await sharp(file.buffer)
-            .resize(1200, 1200, { 
+            .resize(800, 800, {  // Reducido de 1200 a 800
               fit: 'inside',
               withoutEnlargement: true 
             })
             .jpeg({ 
-              quality: 85,
-              progressive: true 
+              quality: 75,  // Reducido de 85 a 75 para más velocidad
+              progressive: false  // Más rápido sin progressive
             })
             .toBuffer();
           

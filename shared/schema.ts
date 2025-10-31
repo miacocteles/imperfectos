@@ -104,6 +104,7 @@ export type ProfileCard = {
   age: number;
   primaryPhoto: string | null;
   allPhotos: string[]; // Array con todas las fotos validadas
+  defectPhotos: string[]; // Array con fotos de defectos
   defectCount: number;
   topDefects: string[];
   compatibilityScore?: number;

@@ -235,6 +235,7 @@ class DatabaseStorage implements IStorage {
         age: user.age,
         primaryPhoto: primaryPhoto?.url || null,
         allPhotos: photos.map(p => p.url), // Incluir todas las fotos validadas
+        defectPhotos: defects.filter(d => d.photoUrl).map(d => d.photoUrl!), // Fotos de defectos
         defectCount: defects.length,
         topDefects: defects.slice(0, 3).map(d => d.title),
         compatibilityScore,
