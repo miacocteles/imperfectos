@@ -69,12 +69,12 @@ export function ProfileDetailView({
         <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
           {/* Photo Gallery */}
           <div className="relative">
-            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
+            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10">
               {validatedPhotos.length > 0 ? (
                 <img
                   src={validatedPhotos[currentPhotoIndex].url}
                   alt={profile.name}
-                  className="w-full h-full object-contain bg-black"
+                  className="w-full h-full object-cover"
                   data-testid="img-profile-photo"
                 />
               ) : (
@@ -122,14 +122,7 @@ export function ProfileDetailView({
                 </div>
               </>
             )}
-
-            {/* AI Validation Badge */}
-            <div className="absolute top-4 right-4">
-              <Badge className="bg-green-500/90 backdrop-blur-sm shadow-lg" data-testid="badge-ai-verified">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Verificado por IA
-              </Badge>
-            </div>
+            {/* Removed AI Validation Badge */}
           </div>
 
           {/* Profile Info */}
@@ -144,39 +137,38 @@ export function ProfileDetailView({
             )}
           </div>
 
-          {/* Compatibility */}
+          {/* Compatibility - muy discreto */}
           {compatibilityScore !== undefined && (
-            <Card className="p-6">
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full border-4 border-primary mb-3">
-                  <span className="text-4xl font-bold text-primary" data-testid="text-compatibility-score">
-                    {compatibilityScore}%
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Compatibilidad basada en imperfecciones compartidas
-                </p>
+            <div className="text-center py-2">
+              <div className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground opacity-60">
+                <span className="font-semibold" data-testid="text-compatibility-score">
+                  {compatibilityScore}%
+                </span>
+                <span>compatible</span>
               </div>
+            </div>
+          )}
 
-              {sharedDefects.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium mb-3" data-testid="text-shared-defects-count">
-                    {sharedDefects.length} {sharedDefects.length === 1 ? 'defecto en común' : 'defectos en común'}
-                  </p>
-                  <div className="space-y-2">
-                    {sharedDefects.slice(0, 5).map((defect, index) => (
-                      <div 
-                        key={index}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-muted"
-                        data-testid={`shared-defect-${index}`}
-                      >
-                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="text-sm">{defect}</span>
-                      </div>
-                    ))}
-                  </div>
+          {/* Shared Defects */}
+          {sharedDefects && sharedDefects.length > 0 && (
+            <Card className="p-4">
+              <div>
+                <p className="text-sm font-medium mb-3" data-testid="text-shared-defects-count">
+                  {sharedDefects.length} {sharedDefects.length === 1 ? 'defecto en común' : 'defectos en común'}
+                </p>
+                <div className="space-y-2">
+                  {sharedDefects.slice(0, 5).map((defect, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted"
+                      data-testid={`shared-defect-${index}`}
+                    >
+                      <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">{defect}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
             </Card>
           )}
 

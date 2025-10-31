@@ -34,16 +34,7 @@ export default function Home() {
     },
     onSuccess: (data: { isMatch: boolean; matchId?: string }) => {
       if (data.isMatch) {
-        toast({
-          title: "¡Es un Match!",
-          description: "Ambos están interesados. ¡Conéctense!",
-        });
         queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-      } else {
-        toast({
-          title: "Like enviado",
-          description: "Si hay interés mutuo, te notificaremos",
-        });
       }
       handleNext();
     },

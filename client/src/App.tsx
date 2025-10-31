@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Flame, Heart } from "lucide-react";
+import { Binoculars, Sparkles } from "lucide-react";
 import { UserSelector } from "@/components/user-selector";
 import { motion, AnimatePresence } from "framer-motion";
 import Home from "@/pages/home";
@@ -36,8 +36,8 @@ function Navigation() {
   }, [lastScrollY]);
 
   const navItems = [
-    { path: "/", label: "Descubrir", icon: Flame },
-    { path: "/matches", label: "Matches", icon: Heart },
+    { path: "/", label: "Descubrir", icon: Binoculars },
+    { path: "/matches", label: "Matches", icon: Sparkles },
   ];
 
   return (
@@ -48,9 +48,9 @@ function Navigation() {
           animate={{ y: 0 }}
           exit={{ y: 100 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40 shadow-2xl"
+          className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 md:hidden z-40"
         >
-          <div className="flex items-center justify-around h-16 px-6 pb-safe">
+          <div className="flex items-center justify-around h-14 px-4 pb-safe">
             {navItems.map((item) => {
               const isActive = location === item.path;
               const Icon = item.icon;
@@ -59,14 +59,14 @@ function Navigation() {
                 <Link key={item.path} href={item.path}>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    className={`flex flex-col items-center justify-center gap-1 py-2 px-4 rounded-2xl transition-all ${
+                    className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl transition-all ${
                       isActive 
                         ? "text-rose-500" 
                         : "text-gray-400"
                     }`}
                   >
-                    <Icon className={`w-7 h-7 ${isActive ? "fill-rose-500" : ""}`} />
-                    <span className={`text-xs ${isActive ? "font-bold" : "font-medium"}`}>
+                    <Icon className={`w-6 h-6 ${isActive ? "stroke-[2.5]" : "stroke-2"}`} />
+                    <span className={`text-[10px] ${isActive ? "font-semibold" : "font-medium"}`}>
                       {item.label}
                     </span>
                   </motion.button>
