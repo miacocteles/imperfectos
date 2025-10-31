@@ -2,7 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X, TrendingUp, Info } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import type { ProfileCard as ProfileCardType } from "@shared/schema";
 
 interface ProfileCardProps {
@@ -20,7 +21,28 @@ export function ProfileCard({
   onClick,
   showActions = true 
 }: ProfileCardProps) {
-  const handleCardClick = () => {
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const photos = profile.allPhotos.length > 0 ? profile.allPhotos : (profile.primaryPhoto ? [profile.primaryPhoto] : []);
+  
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Si se hace clic en los lados, cambiar foto
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const third = rect.width / 3;
+    
+    if (x < third && currentPhotoIndex > 0) {
+      e.stopPropagation();
+      setCurrentPhotoIndex(prev => prev - 1);
+      return;
+    }
+    
+    if (x > third * 2 && currentPhotoIndex < photos.length - 1) {
+      e.stopPropagation();
+      setCurrentPhotoIndex(prev => prev + 1);
+      return;
+    }
+    
+    // Si se hace clic en el centro, abrir detalle
     if (onClick) {
       onClick(profile.id);
     }
@@ -48,16 +70,43 @@ export function ProfileCard({
       >
         <Card 
           className="overflow-hidden cursor-pointer border-2 border-primary/20 shadow-lg hover:shadow-2xl hover:border-primary/40 transition-all duration-300 rounded-3xl bg-white card-3d"
-          onClick={handleCardClick}
           data-testid={`card-profile-${profile.id}`}
         >
-          <div className="relative aspect-[3/4] bg-gradient-to-br from-muted/30 to-muted/10">
-            {profile.primaryPhoto ? (
-              <img 
-                src={profile.primaryPhoto} 
-                alt={`${profile.name}, ${profile.age}`}
-                className="w-full h-full object-cover"
-              />
+          <div 
+            className="relative aspect-[3/4] bg-gradient-to-br from-muted/30 to-muted/10"
+            onClick={handleCardClick}
+          >
+            {photos.length > 0 ? (
+              <>
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentPhotoIndex}
+                    src={photos[currentPhotoIndex]}
+                    alt={`${profile.name}, ${profile.age}`}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </AnimatePresence>
+                
+                {/* Indicadores de foto */}
+                {photos.length > 1 && (
+                  <div className="absolute top-2 left-0 right-0 flex justify-center gap-1 px-2 z-10">
+                    {photos.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-1 flex-1 rounded-full transition-all ${
+                          index === currentPhotoIndex
+                            ? 'bg-white'
+                            : 'bg-white/40'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
                 <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-3">
@@ -116,15 +165,15 @@ export function ProfileCard({
                     )}
                   </div>
                 )}
-
-                {/* Badge de compatibilidad - pequeño y discreto */}
-                {profile.compatibilityScore !== undefined && (
-                  <div className="flex items-center gap-1.5 text-xs opacity-75">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>{profile.compatibilityScore}% compatible</span>
-                  </div>
-                )}
               </div>
+
+              {/* Badge de compatibilidad - muy pequeño al final */}
+              {profile.compatibilityScore !== undefined && (
+                <div className="mt-2 flex items-center gap-1 text-[10px] opacity-60">
+                  <TrendingUp className="w-2.5 h-2.5" />
+                  <span>{profile.compatibilityScore}%</span>
+                </div>
+              )}
             </div>
           </div>
         </Card>

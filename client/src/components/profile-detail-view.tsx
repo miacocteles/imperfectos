@@ -74,7 +74,7 @@ export function ProfileDetailView({
                 <img
                   src={validatedPhotos[currentPhotoIndex].url}
                   alt={profile.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-black"
                   data-testid="img-profile-photo"
                 />
               ) : (

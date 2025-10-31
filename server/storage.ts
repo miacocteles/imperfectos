@@ -217,8 +217,8 @@ class DatabaseStorage implements IStorage {
 
     for (const user of users) {
       const defects = allDefects.filter(d => d.userId === user.id);
-      const photos = allPhotos.filter(p => p.userId === user.id);
-      const primaryPhoto = photos.find(p => p.isPrimary && p.isValidated) || photos.find(p => p.isValidated);
+      const photos = allPhotos.filter(p => p.userId === user.id && p.isValidated);
+      const primaryPhoto = photos.find(p => p.isPrimary) || photos[0];
       
       // Calculate compatibility score (simplified for performance)
       let compatibilityScore = 50; // base score
@@ -234,6 +234,7 @@ class DatabaseStorage implements IStorage {
         name: user.name,
         age: user.age,
         primaryPhoto: primaryPhoto?.url || null,
+        allPhotos: photos.map(p => p.url), // Incluir todas las fotos validadas
         defectCount: defects.length,
         topDefects: defects.slice(0, 3).map(d => d.title),
         compatibilityScore,
