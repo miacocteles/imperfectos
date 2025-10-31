@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, TrendingUp, Info } from "lucide-react";
+import { X, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import type { ProfileCard as ProfileCardType } from "@shared/schema";
@@ -173,14 +173,6 @@ export function ProfileCard({
                   </div>
                 )}
               </div>
-
-              {/* Badge de compatibilidad - muy pequeño al final */}
-              {profile.compatibilityScore !== undefined && (
-                <div className="mt-2 flex items-center gap-1 text-[10px] opacity-60">
-                  <TrendingUp className="w-2.5 h-2.5" />
-                  <span>{profile.compatibilityScore}%</span>
-                </div>
-              )}
             </div>
           </div>
         </Card>

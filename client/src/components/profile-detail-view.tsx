@@ -69,7 +69,22 @@ export function ProfileDetailView({
         <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
           {/* Photo Gallery */}
           <div className="relative">
-            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10">
+            <div 
+              className="aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 cursor-pointer"
+              onClick={(e) => {
+                if (hasMultiplePhotos) {
+                  const rect = (e.target as HTMLElement).getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const third = rect.width / 3;
+                  
+                  if (x < third && currentPhotoIndex > 0) {
+                    prevPhoto();
+                  } else if (x > third * 2 && currentPhotoIndex < validatedPhotos.length - 1) {
+                    nextPhoto();
+                  }
+                }
+              }}
+            >
               {validatedPhotos.length > 0 ? (
                 <img
                   src={validatedPhotos[currentPhotoIndex].url}
@@ -136,18 +151,6 @@ export function ProfileDetailView({
               </p>
             )}
           </div>
-
-          {/* Compatibility - muy discreto */}
-          {compatibilityScore !== undefined && (
-            <div className="text-center py-2">
-              <div className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground opacity-60">
-                <span className="font-semibold" data-testid="text-compatibility-score">
-                  {compatibilityScore}%
-                </span>
-                <span>compatible</span>
-              </div>
-            </div>
-          )}
 
           {/* Shared Defects */}
           {sharedDefects && sharedDefects.length > 0 && (
