@@ -24,6 +24,12 @@ const upload = multer({
 let currentUserId: string | null = null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Development only: Reset current user
+  app.post("/api/auth/logout", async (req, res) => {
+    currentUserId = null;
+    res.json({ success: true });
+  });
+
   // Get current user
   app.get("/api/auth/current-user", async (req, res) => {
     try {
@@ -81,20 +87,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create profile with photos and defects
   app.post("/api/profiles", upload.any(), async (req, res) => {
     try {
+      console.log("📝 Iniciando creación de perfil...");
+      
       // Check if user already has a profile (prevent multiple profiles)
       if (currentUserId) {
+        console.log(`⚠️ Usuario ${currentUserId} ya tiene perfil`);
         return res.status(400).json({ message: "Ya tienes un perfil creado. Solo puedes tener un perfil por cuenta." });
       }
 
       const { name, age, bio, defects } = req.body;
       const files = req.files as Express.Multer.File[];
       
+      console.log(`📊 Datos recibidos: name=${name}, age=${age}, files=${files?.length || 0}`);
+      
       // Separate profile photos from defect photos
       const profilePhotos = files.filter(f => f.fieldname === 'photos');
       const defectPhotoFiles = files.filter(f => f.fieldname.startsWith('defectPhotos['));
 
+      console.log(`📸 Fotos de perfil: ${profilePhotos.length}, Fotos de defectos: ${defectPhotoFiles.length}`);
+
       // Validation
       if (!name || !age) {
+        console.log("❌ Validación fallida: falta name o age");
         return res.status(400).json({ message: "Name and age are required" });
       }
 
@@ -151,6 +165,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Upload profile photos
       console.log(`📸 Processing ${profilePhotos.length} profile photos...`);
+      console.log(`⏱️  Esto puede tomar ${profilePhotos.length * 2}-${profilePhotos.length * 4} segundos dependiendo del tamaño de las imágenes...`);
+      
       const photoPromises = profilePhotos.map(async (file, index) => {
         try {
           console.log(`  Photo ${index + 1}: ${file.mimetype}, original size: ${(file.size / 1024).toFixed(0)} KB`);
