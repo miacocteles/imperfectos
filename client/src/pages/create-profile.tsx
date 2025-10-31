@@ -1,12 +1,34 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CreateProfileForm } from "@/components/create-profile-form";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 export default function CreateProfile() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  // Check if user already has a profile
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/current-user"],
+    queryFn: async () => {
+      const response = await fetch("/api/auth/current-user");
+      if (!response.ok) throw new Error("Failed to fetch user");
+      return response.json();
+    },
+  });
+
+  // Redirect to home if user already exists (already has profile)
+  useEffect(() => {
+    if (currentUser?.user) {
+      toast({
+        title: "Ya tienes un perfil",
+        description: "Solo puedes crear un perfil por cuenta",
+      });
+      setLocation("/");
+    }
+  }, [currentUser, setLocation, toast]);
 
   const createProfileMutation = useMutation({
     mutationFn: async (data: {

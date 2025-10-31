@@ -35,6 +35,7 @@ export const likes = pgTable("likes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   fromUserId: varchar("from_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   toUserId: varchar("to_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  isLike: boolean("is_like").notNull().default(true), // true = like, false = dislike/pass
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

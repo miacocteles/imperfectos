@@ -49,12 +49,36 @@ export default function Home() {
     },
   });
 
+  const passMutation = useMutation({
+    mutationFn: async (profileId: string) => {
+      const response = await fetch("/api/pass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toUserId: profileId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to pass profile");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      handleNext();
+    },
+  });
+
   const handleLike = (profileId: string) => {
     likeMutation.mutate(profileId);
   };
 
   const handlePass = () => {
-    handleNext();
+    const currentProfile = profiles[currentIndex];
+    if (currentProfile) {
+      passMutation.mutate(currentProfile.id);
+    } else {
+      handleNext();
+    }
   };
 
   const handleNext = () => {

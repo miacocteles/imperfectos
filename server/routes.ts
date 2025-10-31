@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import { z } from "zod";
+import sharp from "sharp";
 import { storage } from "./storage";
 import { validatePhoto } from "./openai";
 
@@ -78,15 +79,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create profile with photos and defects
-  app.post("/api/profiles", upload.fields([
-    { name: 'photos', maxCount: 6 },
-    { name: 'defectPhotos', maxCount: 10 }
-  ]), async (req, res) => {
+  app.post("/api/profiles", upload.any(), async (req, res) => {
     try {
+      // Check if user already has a profile (prevent multiple profiles)
+      if (currentUserId) {
+        return res.status(400).json({ message: "Ya tienes un perfil creado. Solo puedes tener un perfil por cuenta." });
+      }
+
       const { name, age, bio, defects } = req.body;
-      const files = req.files as { photos?: Express.Multer.File[], defectPhotos?: Express.Multer.File[] };
-      const profilePhotos = files.photos || [];
-      const defectPhotoFiles = files.defectPhotos || [];
+      const files = req.files as Express.Multer.File[];
+      
+      // Separate profile photos from defect photos
+      const profilePhotos = files.filter(f => f.fieldname === 'photos');
+      const defectPhotoFiles = files.filter(f => f.fieldname.startsWith('defectPhotos['));
 
       // Validation
       if (!name || !age) {
@@ -145,24 +150,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Upload profile photos
+      console.log(`📸 Processing ${profilePhotos.length} profile photos...`);
       const photoPromises = profilePhotos.map(async (file, index) => {
         try {
-          // Convert buffer to base64
-          const base64Image = file.buffer.toString("base64");
+          console.log(`  Photo ${index + 1}: ${file.mimetype}, original size: ${(file.size / 1024).toFixed(0)} KB`);
+          
+          // Compress image using sharp
+          const compressedBuffer = await sharp(file.buffer)
+            .resize(1200, 1200, { 
+              fit: 'inside',
+              withoutEnlargement: true 
+            })
+            .jpeg({ 
+              quality: 85,
+              progressive: true 
+            })
+            .toBuffer();
+          
+          const compressedSize = (compressedBuffer.length / 1024).toFixed(0);
+          console.log(`  ✓ Compressed to ${compressedSize} KB (${((compressedBuffer.length / file.size) * 100).toFixed(0)}% of original)`);
+          
+          // Convert compressed buffer to base64
+          const base64Image = compressedBuffer.toString("base64");
           
           // Create photo record
           const photo = await storage.createPhoto({
             userId: user.id,
-            url: `data:${file.mimetype};base64,${base64Image}`,
+            url: `data:image/jpeg;base64,${base64Image}`,
             isPrimary: index === 0,
           });
+          console.log(`  ✓ Photo ${index + 1} created with ID: ${photo.id}`);
 
           // Auto-approve photos for now (validation disabled temporarily)
-          await storage.updatePhotoValidation(
+          const updated = await storage.updatePhotoValidation(
             photo.id,
             true,
             null
           );
+          console.log(`  ✓ Photo ${index + 1} validated: isValidated=${updated?.isValidated}`);
 
           return { 
             photoId: photo.id, 
@@ -170,7 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             feedback: "Foto aceptada",
           };
         } catch (error) {
-          console.error("Error processing photo:", error);
+          console.error(`  ✗ Error processing photo ${index + 1}:`, error);
           return {
             photoId: null,
             isApproved: false,
@@ -180,9 +205,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const validationResults = await Promise.all(photoPromises);
+      console.log(`✅ All ${validationResults.length} photos processed`);
 
       // Upload defect photos if any
       if (defectPhotoFiles && defectPhotoFiles.length > 0) {
+        console.log(`🩹 Processing ${defectPhotoFiles.length} defect photos...`);
         for (const file of defectPhotoFiles) {
           try {
             // Extract defect index from field name (e.g., "defectPhotos[0]" -> 0)
@@ -193,12 +220,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const defectRecord = createdDefects.find(d => d.index === defectIndex);
             
             if (defectRecord) {
+              console.log(`  Defect photo: original size ${(file.size / 1024).toFixed(0)} KB`);
+              
+              // Compress defect photo
+              const compressedBuffer = await sharp(file.buffer)
+                .resize(800, 800, { 
+                  fit: 'inside',
+                  withoutEnlargement: true 
+                })
+                .jpeg({ 
+                  quality: 80,
+                  progressive: true 
+                })
+                .toBuffer();
+              
+              console.log(`  ✓ Compressed to ${(compressedBuffer.length / 1024).toFixed(0)} KB`);
+              
               // Convert buffer to base64
-              const base64Image = file.buffer.toString("base64");
-              const photoUrl = `data:${file.mimetype};base64,${base64Image}`;
+              const base64Image = compressedBuffer.toString("base64");
+              const photoUrl = `data:image/jpeg;base64,${base64Image}`;
               
               // Update defect with photo
               await storage.updateDefectPhoto(defectRecord.id, photoUrl);
+              console.log(`  ✓ Defect photo saved for defect ${defectRecord.id}`);
             }
           } catch (error) {
             console.error("Error processing defect photo:", error);
@@ -255,43 +299,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "No current user" });
       }
 
-      const { toUserId } = req.body;
+      const { toUserId, isLike = true } = req.body;
 
       if (!toUserId) {
         return res.status(400).json({ message: "toUserId is required" });
       }
 
-      // Create the like
+      // Create the like or dislike
       await storage.createLike({
         fromUserId: currentUserId,
         toUserId,
+        isLike,
       });
 
-      // Check if there's a mutual like (match)
-      const likes = await storage.getLikesBetweenUsers(currentUserId, toUserId);
-      
-      const isMutualLike = likes.some(
-        (like) => like.fromUserId === toUserId && like.toUserId === currentUserId
-      );
-
-      if (isMutualLike) {
-        // Create a match
-        const compatibility = await storage.calculateCompatibility(currentUserId, toUserId);
+      // Only check for matches if it's a like (not a dislike)
+      if (isLike) {
+        const likes = await storage.getLikesBetweenUsers(currentUserId, toUserId);
         
-        const match = await storage.createMatch({
-          user1Id: currentUserId,
-          user2Id: toUserId,
-          compatibilityScore: compatibility.score,
-          sharedDefects: compatibility.sharedDefects,
-        });
+        const isMutualLike = likes.some(
+          (like) => like.fromUserId === toUserId && like.toUserId === currentUserId && like.isLike
+        );
 
-        return res.json({ isMatch: true, matchId: match.id });
+        if (isMutualLike) {
+          // Create a match
+          const compatibility = await storage.calculateCompatibility(currentUserId, toUserId);
+          
+          const match = await storage.createMatch({
+            user1Id: currentUserId,
+            user2Id: toUserId,
+            compatibilityScore: compatibility.score,
+            sharedDefects: compatibility.sharedDefects,
+          });
+
+          return res.json({ isMatch: true, matchId: match.id });
+        }
       }
 
       res.json({ isMatch: false });
     } catch (error) {
       console.error("Error creating like:", error);
       res.status(500).json({ message: "Error creating like" });
+    }
+  });
+
+  // Create a pass/dislike
+  app.post("/api/pass", async (req, res) => {
+    try {
+      if (!currentUserId) {
+        return res.status(401).json({ message: "No current user" });
+      }
+
+      const { toUserId } = req.body;
+
+      if (!toUserId) {
+        return res.status(400).json({ message: "toUserId is required" });
+      }
+
+      // Create a dislike record
+      await storage.createLike({
+        fromUserId: currentUserId,
+        toUserId,
+        isLike: false,
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error creating pass:", error);
+      res.status(500).json({ message: "Error creating pass" });
     }
   });
 

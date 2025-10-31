@@ -163,25 +163,34 @@ class DatabaseStorage implements IStorage {
   }
 
   async getDiscoveryProfiles(currentUserId: string): Promise<ProfileCard[]> {
-    // Get users that the current user hasn't liked yet
-    const likedUserIds = await db
+    // Get users that the current user has already seen (liked OR disliked)
+    const seenUserIds = await db
       .select({ id: schema.likes.toUserId })
       .from(schema.likes)
       .where(eq(schema.likes.fromUserId, currentUserId));
 
-    const likedIds = likedUserIds.map(l => l.id);
+    const seenIds = seenUserIds.map(l => l.id);
 
-    // Get all other users except current user and already liked users
-    const users = await db
-      .select()
-      .from(schema.users)
-      .where(
-        and(
-          ne(schema.users.id, currentUserId),
-          likedIds.length > 0 ? sql`${schema.users.id} NOT IN ${likedIds}` : sql`1=1`
+    // Get all other users except current user and already seen users
+    let users;
+    if (seenIds.length > 0) {
+      users = await db
+        .select()
+        .from(schema.users)
+        .where(
+          and(
+            ne(schema.users.id, currentUserId),
+            sql`${schema.users.id} NOT IN (${sql.join(seenIds.map(id => sql`${id}`), sql`, `)})`
+          )
         )
-      )
-      .limit(20);
+        .limit(20);
+    } else {
+      users = await db
+        .select()
+        .from(schema.users)
+        .where(ne(schema.users.id, currentUserId))
+        .limit(20);
+    }
 
     if (users.length === 0) {
       return [];
