@@ -69,24 +69,6 @@ export function ProfileCard({
             
             {/* Gradient overlay profesional */}
             <div className="absolute inset-0 gradient-overlay" />
-            
-            {/* Badge de compatibilidad profesional */}
-            {profile.compatibilityScore !== undefined && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-                className="absolute top-4 right-4"
-              >
-                <Badge 
-                  className="rounded-full px-3.5 py-2 text-sm font-bold shadow-lg bg-white/95 text-primary border-0 backdrop-blur-sm"
-                  data-testid={`badge-compatibility-${profile.id}`}
-                >
-                  <TrendingUp className="w-3.5 h-3.5 mr-1.5 inline" />
-                  {profile.compatibilityScore}%
-                </Badge>
-              </motion.div>
-            )}
 
             {/* Botón info minimalista */}
             <motion.div 
@@ -132,6 +114,14 @@ export function ProfileCard({
                         +{profile.topDefects.length - 3}
                       </Badge>
                     )}
+                  </div>
+                )}
+
+                {/* Badge de compatibilidad - pequeño y discreto */}
+                {profile.compatibilityScore !== undefined && (
+                  <div className="flex items-center gap-1.5 text-xs opacity-75">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>{profile.compatibilityScore}% compatible</span>
                   </div>
                 )}
               </div>

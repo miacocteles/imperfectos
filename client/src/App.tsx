@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Switch, Route, useLocation, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -6,9 +6,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Compass, UserPlus, Home as HomeIcon } from "lucide-react";
+import { Flame, Heart } from "lucide-react";
 import { UserSelector } from "@/components/user-selector";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Home from "@/pages/home";
 import Matches from "@/pages/matches";
 import CreateProfile from "@/pages/create-profile";
@@ -17,46 +17,66 @@ import type { User } from "@shared/schema";
 
 function Navigation() {
   const [location] = useLocation();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const navItems = [
-    { path: "/", label: "Descubrir", icon: Compass },
-    { path: "/matches", label: "Matches", icon: Compass }, // Reutilizamos Compass o null
-    { path: "/create-profile", label: "Perfil", icon: UserPlus },
+    { path: "/", label: "Descubrir", icon: Flame },
+    { path: "/matches", label: "Matches", icon: Heart },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 md:hidden z-50 shadow-lg">
-      <div className="flex items-center justify-around h-16 px-4">
-        {navItems.map((item) => {
-          const isActive = location === item.path;
-          const Icon = item.icon;
-          
-          return (
-            <Link key={item.path} href={item.path}>
-              <motion.div
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`flex flex-col items-center gap-1 h-auto py-2.5 px-5 rounded-xl transition-all ${
-                    isActive 
-                      ? "text-primary bg-primary/10" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
-                  data-testid={`nav-${item.path.replace("/", "") || "home"}`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? "stroke-[2.5]" : ""}`} />
-                  <span className={`text-xs ${isActive ? "font-semibold" : "font-medium"}`}>
-                    {item.label}
-                  </span>
-                </Button>
-              </motion.div>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.nav
+          initial={{ y: 0 }}
+          animate={{ y: 0 }}
+          exit={{ y: 100 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40 shadow-2xl"
+        >
+          <div className="flex items-center justify-around h-16 px-6 pb-safe">
+            {navItems.map((item) => {
+              const isActive = location === item.path;
+              const Icon = item.icon;
+              
+              return (
+                <Link key={item.path} href={item.path}>
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    className={`flex flex-col items-center justify-center gap-1 py-2 px-4 rounded-2xl transition-all ${
+                      isActive 
+                        ? "text-rose-500" 
+                        : "text-gray-400"
+                    }`}
+                  >
+                    <Icon className={`w-7 h-7 ${isActive ? "fill-rose-500" : ""}`} />
+                    <span className={`text-xs ${isActive ? "font-bold" : "font-medium"}`}>
+                      {item.label}
+                    </span>
+                  </motion.button>
+                </Link>
+              );
+            })}
+          </div>
+        </motion.nav>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -66,7 +86,6 @@ function DesktopHeader() {
   const navItems = [
     { path: "/", label: "Descubrir" },
     { path: "/matches", label: "Matches" },
-    { path: "/create-profile", label: "Crear Perfil" },
   ];
 
   return (

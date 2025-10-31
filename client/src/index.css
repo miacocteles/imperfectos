@@ -569,3 +569,91 @@
 .animate-pulse-ring {
   animation: pulse-ring 2s infinite;
 }
+
+/* ========== OPTIMIZACIONES MÓVILES ========== */
+@layer utilities {
+  /* Táctil - Áreas de toque más grandes */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on buttons/cards */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Safe areas for iPhone notch */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Full mobile viewport height */
+  .h-mobile-screen {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  /* Larger touch targets */
+  button, a {
+    @apply touch-target no-select;
+  }
+
+  /* Full-width cards on mobile */
+  .profile-card {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Bottom navigation always visible */
+  nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    z-index: 999 !important;
+  }
+
+  /* Reduce animations on mobile for better performance */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Force mobile styles for all screens (since app is mobile-only) */
+html, body {
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  @apply no-select;
+}
+
+body {
+  font-size: 16px; /* Prevent iOS zoom on input focus */
+}
+
+input, textarea, select {
+  font-size: 16px !important; /* Prevent iOS zoom */
+}
+
+/* Smooth tap feedback */
+button:active, a:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
