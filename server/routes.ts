@@ -88,12 +88,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/profiles", upload.any(), async (req, res) => {
     try {
       console.log("📝 Iniciando creación de perfil...");
-      
-      // Check if user already has a profile (prevent multiple profiles)
-      if (currentUserId) {
-        console.log(`⚠️ Usuario ${currentUserId} ya tiene perfil`);
-        return res.status(400).json({ message: "Ya tienes un perfil creado. Solo puedes tener un perfil por cuenta." });
-      }
 
       const { name, age, bio, defects } = req.body;
       const files = req.files as Express.Multer.File[];
