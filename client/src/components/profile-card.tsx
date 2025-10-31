@@ -26,8 +26,13 @@ export function ProfileCard({
   // Combinar fotos de perfil con fotos de defectos
   const profilePhotos = profile.allPhotos.length > 0 ? profile.allPhotos : (profile.primaryPhoto ? [profile.primaryPhoto] : []);
   const defectPhotos = profile.defectPhotos || [];
-  const allPhotos = [...profilePhotos, ...defectPhotos];
+  const allPhotos = [...profilePhotos, ...defectPhotos.map(d => d.photoUrl)];
   const defectStartIndex = profilePhotos.length; // Índice donde empiezan las fotos de defectos
+  
+  // Determinar si la foto actual es de un defecto y cuál
+  const currentDefect = currentPhotoIndex >= defectStartIndex 
+    ? defectPhotos[currentPhotoIndex - defectStartIndex]
+    : null;
   
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Si se hace clic en los lados, cambiar foto
@@ -152,23 +157,36 @@ export function ProfileCard({
                 
                 {profile.topDefects.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {profile.topDefects.slice(0, 3).map((defect, index) => (
-                      <Badge 
-                        key={index}
-                        variant="secondary" 
-                        className="text-xs font-medium glass-dark backdrop-blur-sm text-white border-white/20 py-1 px-2.5"
-                        data-testid={`badge-defect-${profile.id}-${index}`}
-                      >
-                        {defect}
-                      </Badge>
-                    ))}
-                    {profile.topDefects.length > 3 && (
+                    {/* Mostrar el defecto actual si estamos viendo una foto de defecto */}
+                    {currentDefect ? (
                       <Badge 
                         variant="secondary" 
-                        className="text-xs font-medium glass-dark backdrop-blur-sm text-white border-white/20 py-1 px-2.5"
+                        className="text-xs font-semibold glass-dark backdrop-blur-sm text-white border-red-500 border-2 py-1 px-2.5 animate-pulse"
                       >
-                        +{profile.topDefects.length - 3}
+                        {currentDefect.title}
                       </Badge>
+                    ) : (
+                      // Mostrar los top defects normalmente
+                      <>
+                        {profile.topDefects.slice(0, 3).map((defect, index) => (
+                          <Badge 
+                            key={index}
+                            variant="secondary" 
+                            className="text-xs font-medium glass-dark backdrop-blur-sm text-white border-white/20 py-1 px-2.5"
+                            data-testid={`badge-defect-${profile.id}-${index}`}
+                          >
+                            {defect}
+                          </Badge>
+                        ))}
+                        {profile.topDefects.length > 3 && (
+                          <Badge 
+                            variant="secondary" 
+                            className="text-xs font-medium glass-dark backdrop-blur-sm text-white border-white/20 py-1 px-2.5"
+                          >
+                            +{profile.topDefects.length - 3}
+                          </Badge>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

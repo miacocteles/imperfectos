@@ -70,7 +70,7 @@ export function ProfileDetailView({
           {/* Photo Gallery */}
           <div className="relative">
             <div 
-              className="aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 cursor-pointer"
+              className="aspect-[4/5] md:aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 cursor-pointer"
               onClick={(e) => {
                 if (hasMultiplePhotos) {
                   const rect = (e.target as HTMLElement).getBoundingClientRect();
